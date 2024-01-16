@@ -1,41 +1,47 @@
-from cgi import log
+from dataclasses import dataclass
+from enum import Enum
 from functools import reduce
 from logging import WARNING
 import numpy as np
+from typing import Dict, Optional
 
-from exareme2.imaging_data.imaging_utilities import ndarrays_to_parameters
-from exareme2.imaging_data.imaging_utilities import parameters_to_ndarrays
+from imaging_utilities import parameters_to_ndarrays, ndarrays_to_parameters, NDArrays, Parameters
+from lr_imaging_mnist_local import LRImagingLocal
+
+
+
+class Code(Enum):
+    """Client status codes."""
+
+    OK = 0
+    GET_PROPERTIES_NOT_IMPLEMENTED = 1
+    GET_PARAMETERS_NOT_IMPLEMENTED = 2
+    FIT_NOT_IMPLEMENTED = 3
+    EVALUATE_NOT_IMPLEMENTED = 4
 
 
 def aggregate_fit(
-    self,
-    server_round: int,
-    results  #: List[Tuple[ClientProxy, FitRes]],
-    # failures, #: List[Union[Tuple[ClientProxy, FitRes], BaseException]],
-):  # -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
+        results: Dict[str, Dict],
+) -> Optional[Parameters]:
     """Aggregate fit results using weighted average."""
-    if not results:
-        return None, {}
-    # Do not aggregate if there are failures and failures are not accepted
-    if not self.accept_failures and failures:
-        return None, {}
 
     # Convert results
     weights_results = [
-        (parameters_to_ndarrays(fit_res.parameters), fit_res.num_examples)
-        for _, fit_res in results
+        (fit_res["params"], fit_res["n_obs"])
+        for _, fit_res in results.items()
     ]
     parameters_aggregated = ndarrays_to_parameters(aggregate(weights_results))
-
-    # Aggregate custom metrics if aggregation fn was provided
-    metrics_aggregated = {}
-    if self.fit_metrics_aggregation_fn:
-        fit_metrics = [(res.num_examples, res.metrics) for _, res in results]
-        metrics_aggregated = self.fit_metrics_aggregation_fn(fit_metrics)
-    elif server_round == 1:  # Only log this warning once
-        log(WARNING, "No fit_metrics_aggregation_fn provided")
-
-    return parameters_aggregated, metrics_aggregated
+    return parameters_aggregated
+    # TODO: Endgoal should have also the metrics below is the og format
+    # # Aggregate custom metrics if aggregation fn was provided
+    # metrics_aggregated = {}
+    # if self.fit_metrics_aggregation_fn:
+    #     fit_metrics = [(res.num_examples, res.metrics) for _, res in results]
+    #     metrics_aggregated = self.fit_metrics_aggregation_fn(fit_metrics)
+    # elif server_round == 1:  # Only log this warning once
+    #     log(WARNING, "No fit_metrics_aggregation_fn provided")
+    #
+    # return parameters_aggregated, metrics_aggregated
 
 
 # def imaging_fed_average(evaluate_fn, fit_round):

@@ -1,4 +1,5 @@
-from typing import cast
+from dataclasses import dataclass
+from typing import cast, Dict, Callable
 from typing import Tuple
 from typing import Union
 from io import BytesIO
@@ -18,6 +19,25 @@ XY = Tuple[np.ndarray, np.ndarray]
 Dataset = Tuple[XY, XY]
 LogRegParams = Union[XY, Tuple[np.ndarray]]
 XYList = List[XY]
+Scalar = Union[bool, bytes, float, int, str]
+Metrics = Dict[str, Scalar]
+MetricsAggregationFn = Callable[[List[Tuple[int, Metrics]]], Metrics]
+
+@dataclass
+class Parameters:
+    """Model parameters."""
+
+    tensors: List[bytes]
+    tensor_type: str
+
+
+@dataclass
+class FitRes:
+    """Fit response from a client."""
+    parameters: Parameters
+    num_examples: int
+    metrics: Dict[str, Scalar]
+
 
 def ndarrays_to_parameters(ndarrays: NDArrays) -> Parameters:
     """Convert NumPy ndarrays to parameters object."""
@@ -70,9 +90,9 @@ def get_model_parameters(model: LogisticRegression):
 # def set_model_params(model: LogisticRegression, params) -> LogisticRegression:
 def set_model_params(model, params):
     """Sets the parameters of a sklean LogisticRegression model."""
-    model.coef_ = params.coef_
+    model.coef_ = params["coef"]
     if model.fit_intercept:
-        model.intercept_ = params.intercept_
+        model.intercept_ = params["intercept"]
     return model
 
 

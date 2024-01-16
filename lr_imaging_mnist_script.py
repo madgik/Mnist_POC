@@ -1,32 +1,37 @@
-from exareme2.imaging_data.lr_imaging_mnist_global import LRImagingGlobal
-from exareme2.imaging_data.lr_imaging_mnist_local import LRImagingLocal
+from lr_imaging_mnist_global import LRImagingGlobal
+from lr_imaging_mnist_local import LRImagingLocal
 
 data_locations = [
-    "exareme2/imaging_data/MNIST/node1",
-    "exareme2/imaging_data/MNIST/node2",
+    "imaging_data/MNIST/training/node1",
+    "imaging_data/MNIST/training/node2",
 ]
 
 
 def RunDrill(data_locations):
     round = 0  # Loop condition
+    data_location_node1 = data_locations[0]
+    data_location_node2 = data_locations[1]
 
+    # Process data in the local class
+    result_node1 = LRImagingLocal(data_location_node1)
+    result_node2 = LRImagingLocal(data_location_node2)
+    # Process data in the local class
+    fit_res1, res_eval1 = result_node1.init_step()
+    fit_res2, res_eval2 = result_node2.init_step()
+
+    #TODO INIT LRImagingLocal for both nodes
     while round < 5:
-        # Some initial data
-
-        data_location_node1 = data_locations[0]
-        data_location_node2 = data_locations[1]
-
         # Process data in the local class
         result_node1 = LRImagingLocal(data_location_node1)
         result_node2 = LRImagingLocal(data_location_node2)
 
-        local_results = {"result_node1": result_node1, "result_node2": result_node2}
+        fit_res_all = {"result_node1": fit_res1, "result_node2": fit_res2}
 
         # Conditionally continue the loop based on the result
         if result_node1 and result_node2:
             # Process data in the second class
             result_global = LRImagingGlobal()
-            aggregates = result_global.calculate_aggregates(round, local_results)
+            aggregates = result_global.calculate_aggregates(fit_res_all)
 
             # Modify the condition based on the result
 

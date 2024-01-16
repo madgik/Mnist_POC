@@ -9,7 +9,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import log_loss
 from sklearn.model_selection import train_test_split
 
-from exareme2.imaging_data import imaging_utilities as utils
+import imaging_utilities as utils
 
 
 # Define a function to load and process images with dynamic sizes
@@ -99,11 +99,11 @@ class LRImagingLocal:
 
         return res_fit, res_eval
 
-    def get_parameters(self, config):  # type: ignore
+    def get_parameters(self, config= None):  # type: ignore
         return utils.get_model_parameters(self.model)
 
     def fit(self, model, config=None):  # type: ignore
-        parameters = [model.coef_, model.intercept_]
+        parameters = {"coef": model.coef_, "intercept": model.intercept_}
         utils.set_model_params(model, parameters)
         # Ignore convergence failure due to low local epochs
         with warnings.catch_warnings():
