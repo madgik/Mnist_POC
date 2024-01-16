@@ -22,7 +22,7 @@ class Code(Enum):
 
 def aggregate_fit(
         results: Dict[str, Dict],
-) -> Optional[Parameters]:
+) -> NDArrays:
     """Aggregate fit results using weighted average."""
 
     # Convert results
@@ -30,8 +30,8 @@ def aggregate_fit(
         (fit_res["params"], fit_res["n_obs"])
         for _, fit_res in results.items()
     ]
-    parameters_aggregated = ndarrays_to_parameters(aggregate(weights_results))
-    return parameters_aggregated
+    ndarrays_aggregated = aggregate(weights_results)
+    return ndarrays_aggregated
     # TODO: Endgoal should have also the metrics below is the og format
     # # Aggregate custom metrics if aggregation fn was provided
     # metrics_aggregated = {}

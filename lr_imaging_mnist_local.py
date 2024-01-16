@@ -103,7 +103,7 @@ class LRImagingLocal:
         return utils.get_model_parameters(self.model)
 
     def fit(self, model, config=None):  # type: ignore
-        parameters = {"coef": model.coef_, "intercept": model.intercept_}
+        parameters = [model.coef_, model.intercept_]
         utils.set_model_params(model, parameters)
         # Ignore convergence failure due to low local epochs
         with warnings.catch_warnings():

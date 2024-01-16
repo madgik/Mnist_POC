@@ -90,9 +90,9 @@ def get_model_parameters(model: LogisticRegression):
 # def set_model_params(model: LogisticRegression, params) -> LogisticRegression:
 def set_model_params(model, params):
     """Sets the parameters of a sklean LogisticRegression model."""
-    model.coef_ = params["coef"]
+    model.coef_ = params[0]
     if model.fit_intercept:
-        model.intercept_ = params["intercept"]
+        model.intercept_ = params[1]
     return model
 
 
